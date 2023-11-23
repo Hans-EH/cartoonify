@@ -3,6 +3,7 @@ import imageio
 from PIL import Image
 import cv2
 
+from photo_cartoon import anime_face
 def split_video_into_images(input_path, output_folder, frame_skip, max_height=720):
     # Create output folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
@@ -23,6 +24,8 @@ def split_video_into_images(input_path, output_folder, frame_skip, max_height=72
     # Iterate through frames, skipping every second frame
     for frame_number, frame_np in enumerate(reader):
         if frame_number % frame_skip == 0:
+            frame_np = anime_face(frame_np)#  REMOVE THIS IF YOU DONT WANT TO FACE SWAP
+
             # Convert the NumPy array to a PIL Image
             frame_pil = Image.fromarray(frame_np)
 
@@ -123,8 +126,11 @@ if __name__ == "__main__":
     output_folder = "temp_images"
     cartoon_folder = "cartonized_images"
     output_audio_path = "temp_files/extracted_audio.aac"
-    output_combined_video_path = "output/output.mp4"
+    output_combined_video_path = "output/output_cartoon.mp4"
+    output_combined_video_path_face_swapped = "output/output_face_swapped.mp4"
+
     output_cartoon_video = "temp_files/cartoonized_video.mp4"
+    output_face_swapped_video = "temp_files/face_swpped_video.mp4"
     fps = get_video_fps(input_video_path)
     fps_division = 2
     fps = fps/fps_division
@@ -139,6 +145,9 @@ if __name__ == "__main__":
     images_to_video(cartoon_folder,output_cartoon_video,fps)
     extract_audio(input_video_path,output_audio_path)
     combine_audio_with_video(output_cartoon_video, output_audio_path, output_combined_video_path)
+
+    images_to_video(output_folder,output_face_swapped_video,fps)
+    combine_audio_with_video(output_face_swapped_video, output_audio_path, output_combined_video_path_face_swapped)
 
 
     

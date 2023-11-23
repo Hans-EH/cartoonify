@@ -119,7 +119,7 @@ def combine_audio_with_video(video_path, audio_path, output_video_path):
     audio_clip.close()
 
 if __name__ == "__main__":
-    input_video_path = "input/input.mp4"
+    input_video_path = "input/input.mov"
     output_folder = "output_images"
     cartoon_folder = "cartonized_images"
     output_audio_path = "temp_files/extracted_audio.aac"

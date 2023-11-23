@@ -19,8 +19,14 @@ import flask
 from PIL import Image
 import numpy as np
 import skvideo.io
-
 from cartoonize import WB_Cartoonize
+
+import numpy as np
+import glob
+import matplotlib.pyplot as plt
+import insightface
+from insightface.app import FaceAnalysis
+from insightface.data import get_image as ins_get_image
 
 wb_cartoonizer = WB_Cartoonize(os.path.abspath("saved_models/"), opts['gpu'])
 
@@ -94,8 +100,26 @@ def enhance_image(input_path, output_path):
     enhanced_pil_image.save(output_path)
 
 
-if __name__ == "__main__":
-    input_image_path = "out.jpg"
-    output_image_path = "test7.jpg"
+def anime_face(img):
+    app = FaceAnalysis(name='buffalo_l')
+    app.prepare(ctx_id=0,det_size=(640,640))
+    faces = app.get(img)
+    source_face = cv2.imread('input/source_face.png')
+    source_face = app.get(source_face)[0]
+    swapper = insightface.model_zoo.get_model('inswapper_128.onnx',download=False,download_zip=False)
+    res = img.copy()
 
-    enhance_image(input_image_path, output_image_path)
+    for face in faces:
+        res = swapper.get(res,face,source_face, paste_back=True)
+    return res
+
+
+
+
+if __name__ == "__main__":
+    input_image_path = "in.png"
+    output_image_path = "out.png"
+    face = anime_face(cv2.imread(input_image_path))
+    cv2.imwrite(output_image_path, face)
+
+    #enhance_image(input_image_path, output_image_path)
